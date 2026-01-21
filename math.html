@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Operator Insertion Game</title>
+
+<style>
+body {
+    background: #0f172a;
+    color: white;
+    font-family: Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 40px;
+}
+
+h1 { color: #22c55e; }
+
+#level {
+    font-size: 1.2em;
+    margin-bottom: 10px;
+}
+
+button {
+    padding: 10px 22px;
+    font-size: 1em;
+    font-weight: bold;
+    border: none;
+    border-radius: 6px;
+    background: #22c55e;
+    cursor: pointer;
+    margin: 5px;
+}
+
+button:hover { background: #16a34a; }
+
+#expression {
+    display: flex;
+    gap: 10px;
+    margin: 20px;
+    font-size: 1.5em;
+    align-items: center;
+}
+
+.slot {
+    width: 40px;
+    height: 40px;
+    border: 2px dashed #64748b;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.locked {
+    background: #14532d;
+    border-color: #22c55e;
+}
+
+#target {
+    font-size: 1.3em;
+    margin-top: 10px;
+}
+
+#hint {
+    margin-top: 8px;
+    color: #facc15;
+}
+
+#message {
+    margin-top: 15px;
+    min-height: 24px;
+}
+</style>
+</head>
+<body>
+
+<h1>Insert the Operators</h1>
+
+<div id="level">Level 1</div>
+<button onclick="startGame()">START</button>
+
+<div id="expression"></div>
+
+<div id="target"></div>
+<div id="hint"></div>
+
+<button onclick="checkAnswer()">CHECK</button>
+
+<div id="message"></div>
+
+<script>
+const levels = { 1: 3, 2: 5, 3: 7 };
+const OPS = ["+", "-", "*", "/"];
+
+let currentLevel = 1;
+let numbers = [];
+let slots = [];
+let hintSolutionOps = [];
+let targetValue = 0;
+
+// Timed hint variables
+let revealIndex = 0;
+let revealTimer = null;
+
+function startGame() {
+    currentLevel = 1;
+    startLevel();
+}
+
+function startLevel() {
+    clearInterval(revealTimer);
+    revealIndex = 0;
+
+    document.getElementById("level").textContent = `Level ${currentLevel}`;
+    document.getElementById("message").textContent = "";
+    document.getElementById("hint").textContent = "";
+
+    generatePuzzle();
+    render();
+    startRevealTimer();
+}
+function generatePuzzle() {
+    const opsCount = levels[currentLevel];
+    const numsCount = opsCount + 1;
+
+    // Generate numbers randomly
+    numbers = [];
+    for (let i = 0; i < numsCount; i++) {
+        numbers.push(Math.floor(Math.random() * 9) + 1);
+    }
+
+    // Generate predetermined solution that will define targetValue
+    hintSolutionOps = [];
+    for (let i = 0; i < opsCount; i++) {
+        let op = OPS[Math.floor(Math.random() * 4)];
+
+        // If division, ensure integer result
+        if (op === "/") {
+            let left = numbers[i];
+            let rightCandidates = [];
+            for (let r = 1; r <= 9; r++) {
+                if (left % r === 0) rightCandidates.push(r);
+            }
+            if (rightCandidates.length === 0) op = OPS[Math.floor(Math.random() * 3)]; // fallback to +-* 
+            else numbers[i + 1] = rightCandidates[Math.floor(Math.random() * rightCandidates.length)];
+        }
+
+        hintSolutionOps.push(op);
+    }
+
+    // Evaluate normally to get target value
+    targetValue = evaluate(numbers, hintSolutionOps);
+
+    // Reset player slots
+    slots = Array(opsCount).fill(null);
+}
+
+
+function startRevealTimer() {
+    revealTimer = setInterval(() => {
+        if (revealIndex >= hintSolutionOps.length) {
+            clearInterval(revealTimer);
+            return;
+        }
+
+        // Reveal next operator (locked)
+        slots[revealIndex] = hintSolutionOps[revealIndex];
+        revealIndex++;
+
+        document.getElementById("hint").textContent =
+            `⏱ Hint revealed (${revealIndex}/${hintSolutionOps.length})`;
+
+        render();
+    }, 3000); // every 5 minutes
+}
+
+function render() {
+    const expr = document.getElementById("expression");
+    expr.innerHTML = "";
+
+    numbers.forEach((num, i) => {
+        expr.innerHTML += `<div>${num}</div>`;
+        if (i < slots.length) {
+            const cls = i < revealIndex ? "slot locked" : "slot";
+            expr.innerHTML += `<div class="${cls}" onclick="cycleOp(${i})">${slots[i] ?? ""}</div>`;
+        }
+    });
+
+    document.getElementById("target").textContent = `Target = ${targetValue}`;
+}
+
+function cycleOp(index) {
+    if (index < revealIndex) return; // locked by hint
+    if (slots[index] === null) {
+        slots[index] = OPS[0];
+    } else {
+        slots[index] = OPS[(OPS.indexOf(slots[index]) + 1) % OPS.length];
+    }
+    render();
+}
+
+function checkAnswer() {
+    if (slots.includes(null)) {
+        document.getElementById("message").textContent = "⚠ Fill all operator slots";
+        return;
+    }
+
+    const result = evaluate(numbers, slots);
+    clearInterval(revealTimer);
+
+    if (result === targetValue) {
+    if (currentLevel < 3) {
+        document.getElementById("message").textContent = "✅ Correct! Next level...";
+        currentLevel++;
+        setTimeout(startLevel, 1500);
+    } else {
+        // Level 3 completed → redirect to congratulations page
+        setTimeout(() => {
+            window.location.href = "congratulations.html";
+        }, 1000);
+    }
+} else {
+    document.getElementById("message").textContent = "❌ Wrong! Resetting to Level 1";
+    currentLevel = 1;
+    setTimeout(startLevel, 1500);
+}
+
+}
+function evaluate(nums, ops) {
+    let n = [...nums];
+    let o = [...ops];
+
+    // Step 1: Handle * and / from left to right
+    let i = 0;
+    while (i < o.length) {
+        if (o[i] === "*") {
+            n[i] = n[i] * n[i + 1];
+            n.splice(i + 1, 1);
+            o.splice(i, 1);
+        } else if (o[i] === "/") {
+            n[i] = n[i] / n[i + 1]; // normal floating-point division
+            n.splice(i + 1, 1);
+            o.splice(i, 1);
+        } else {
+            i++;
+        }
+    }
+
+    // Step 2: Handle + and - from left to right
+    i = 0;
+    while (i < o.length) {
+        if (o[i] === "+") {
+            n[i] = n[i] + n[i + 1];
+            n.splice(i + 1, 1);
+            o.splice(i, 1);
+        } else if (o[i] === "-") {
+            n[i] = n[i] - n[i + 1];
+            n.splice(i + 1, 1);
+            o.splice(i, 1);
+        }
+    }
+
+    return n[0];
+}
+
+</script>
+
+</body>
+</html>

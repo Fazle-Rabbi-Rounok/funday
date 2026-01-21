@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Welcome to the Game Hub</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: #0f1226;
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      color: white;
+    }
+
+    #poster {
+      width: 80%;
+      max-width: 600px;
+      border-radius: 12px;
+      box-shadow: 0 0 30px #00ffcc;
+    }
+
+    #start-btn {
+      margin-top: 40px;
+      padding: 15px 30px;
+      font-size: 1.2em;
+      font-weight: bold;
+      border: none;
+      border-radius: 8px;
+      background: #00ffcc;
+      color: #000;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    #start-btn:hover {
+      background: #00d9aa;
+      transform: scale(1.05);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Poster image -->
+  <img id="poster" src="poster.jpg" alt="Welcome Poster">
+
+  <!-- Start button -->
+  <button id="start-btn" onclick="startGame()">Start the Adventure ▶</button>
+
+  <script>
+    function startGame() {
+      // Navigate to the first game (number guessing game)
+      window.location.href = "guess.html"; // rename if your first game file is different
+    }
+  </script>
+
+</body>
+</html>

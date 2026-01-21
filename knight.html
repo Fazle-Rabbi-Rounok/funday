@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Knight's Tour Challenge</title>
+<style>
+    body {
+        background: #1e1e2f;
+        color: #fff;
+        font-family: Arial, sans-serif;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding-top: 20px;
+    }
+    h1 {
+        color: #00ff99;
+        margin-bottom: 10px;
+    }
+    #board {
+        display: grid;
+        grid-template-columns: repeat(8, 60px);
+        grid-template-rows: repeat(8, 60px);
+        gap: 2px;
+        margin-top: 20px;
+    }
+    .cell {
+        width: 60px;
+        height: 60px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-weight: bold;
+        font-size: 1.2em;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+    .white { background-color: #f0d9b5; }
+    .black { background-color: #b58863; }
+    .visited { background-color: #00ff99 !important; color: #000; }
+    .knight { color: #ff0000; font-size: 1.5em; }
+    #message { margin-top: 20px; font-size: 1.2em; text-align: center; }
+    button {
+        margin-top: 20px;
+        padding: 10px 20px;
+        font-size: 1em;
+        border-radius: 5px;
+        border: none;
+        cursor: pointer;
+        background-color: #00ff99;
+        color: #000;
+        font-weight: bold;
+        margin-right: 10px;
+    }
+    button:hover { background-color: #00cc77; }
+    #next-game-btn {
+        margin-top: 15px;
+        padding: 10px 20px;
+        font-size: 1em;
+        border-radius: 6px;
+        border: none;
+        cursor: pointer;
+        background-color: #ff9800;
+        color: #000;
+        font-weight: bold;
+    }
+    #next-game-btn:hover {
+        background-color: #e68900;
+    }
+</style>
+</head>
+<body>
+
+<h1>Knight's Tour Challenge ♞</h1>
+<div id="board"></div>
+<p id="message">Click a starting square to place the knight.</p>
+<div>
+    <button onclick="resetBoard()">Reset</button>
+    <button onclick="undoMove()">Undo</button>
+</div>
+
+<script>
+const boardSize = 8;
+let board = [];
+let knightPos = null;
+let visitedCount = 0;
+let moveStack = [];
+let tourCompleted = false;
+
+function createBoard() {
+    const boardDiv = document.getElementById('board');
+    boardDiv.innerHTML = '';
+    board = [];
+    visitedCount = 0;
+    knightPos = null;
+    moveStack = [];
+    tourCompleted = false;
+    document.getElementById('message').textContent = 'Click a starting square to place the knight.';
+
+    for (let r = 0; r < boardSize; r++) {
+        board[r] = [];
+        for (let c = 0; c < boardSize; c++) {
+            const cell = document.createElement('div');
+            cell.classList.add('cell');
+            cell.classList.add((r + c) % 2 === 0 ? 'white' : 'black');
+            cell.dataset.row = r;
+            cell.dataset.col = c;
+            cell.addEventListener('click', () => handleMove(r, c, cell));
+            boardDiv.appendChild(cell);
+            board[r][c] = cell;
+        }
+    }
+
+    // Remove next game button if it exists
+    const nextBtn = document.getElementById('next-game-btn');
+    if (nextBtn) nextBtn.remove();
+}
+
+function handleMove(r, c, cell) {
+    if (tourCompleted) return;
+
+    if (!knightPos) {
+        // First move: place knight
+        knightPos = {r, c};
+        cell.innerHTML = '♞';
+        cell.classList.add('knight', 'visited');
+        visitedCount = 1;
+        moveStack.push({r, c});
+        return;
+    }
+
+    const moves = [
+        [2,1],[1,2],[-1,2],[-2,1],
+        [-2,-1],[-1,-2],[1,-2],[2,-1]
+    ];
+
+    const isValid = moves.some(([dr, dc]) => dr + knightPos.r === r && dc + knightPos.c === c);
+    if (!isValid || cell.classList.contains('visited')) {
+        document.getElementById('message').textContent = 'Invalid move! Try a legal knight move.';
+        return;
+    }
+
+    // Move knight
+    board[knightPos.r][knightPos.c].innerHTML = '';
+    board[knightPos.r][knightPos.c].classList.remove('knight');
+
+    knightPos = {r, c};
+    cell.innerHTML = '♞';
+    cell.classList.add('knight', 'visited');
+    visitedCount++;
+    moveStack.push({r, c});
+
+    if (visitedCount === boardSize * boardSize) {
+        tourCompleted = true;
+        showCongrats();
+    } else {
+        document.getElementById('message').textContent = `Moves made: ${visitedCount}`;
+    }
+}
+
+function undoMove() {
+    if (moveStack.length <= 1) {
+        document.getElementById('message').textContent = 'Cannot undo the first move.';
+        return;
+    }
+
+    // Remove current position
+    const current = moveStack.pop();
+    board[current.r][current.c].innerHTML = '';
+    board[current.r][current.c].classList.remove('knight', 'visited');
+    visitedCount--;
+
+    // Restore previous knight position
+    const prev = moveStack[moveStack.length - 1];
+    knightPos = {r: prev.r, c: prev.c};
+    const prevCell = board[prev.r][prev.c];
+    prevCell.innerHTML = '♞';
+    prevCell.classList.add('knight');
+
+    document.getElementById('message').textContent = `Move undone. Moves made: ${visitedCount}`;
+}
+
+function resetBoard() {
+    createBoard();
+}
+
+function showCongrats() {
+    document.getElementById('message').innerHTML = `🎉 Congratulations! You completed the Knight's Tour!<br>Moves made: ${visitedCount}`;
+
+    // Add Next Game button
+    const btn = document.createElement('button');
+    btn.id = 'next-game-btn';
+    btn.textContent = 'Next Game ▶';
+    btn.onclick = goToNextGame;
+    document.body.appendChild(btn);
+}
+
+function goToNextGame() {
+    // Replace with URL or function for the next game
+    window.location.href = "math.html";
+}
+
+createBoard();
+</script>
+
+</body>
+</html>

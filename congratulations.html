@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Congratulations!</title>
+<style>
+  body {
+    background: #0f172a;
+    color: #facc15;
+    font-family: Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    text-align: center;
+  }
+
+  h1 {
+    font-size: 2.2em;
+    color: #22c55e;
+    margin-bottom: 20px;
+  }
+
+  p {
+    font-size: 1.3em;
+    margin-bottom: 40px;
+  }
+
+  #home-btn {
+    padding: 15px 30px;
+    font-size: 1.2em;
+    font-weight: bold;
+    border: none;
+    border-radius: 8px;
+    background-color: #22c55e;
+    color: #000;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  #home-btn:hover {
+    background-color: #16a34a;
+    transform: scale(1.05);
+  }
+</style>
+</head>
+<body>
+
+<h1>🎉 Congratulations!</h1>
+<p>You have successfully conquered the Bingo Challenge organized by the Islamic University Science Club.</p>
+<button id="home-btn" onclick="goHome()">Return to Home</button>
+
+<script>
+function goHome() {
+  window.location.href = "index.html"; // Goes back to the welcome page
+}
+</script>
+
+</body>
+</html>
