@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Guess the Word Game</title>
+<style>
+body {
+    background: #1e1e2f;
+    color: #fff;
+    font-family: Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+}
+h1 { color: #00ff99; margin-bottom: 10px; }
+
+#game { width: 320px; }
+
+input[type="text"] {
+    width: 100%;
+    padding: 10px;
+    font-size: 1.2em;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+    text-align: center;
+    border-radius: 5px;
+    border: none;
+}
+
+button {
+    padding: 10px 20px;
+    font-weight: bold;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    background-color: #00ff99;
+    color: #000;
+    font-size: 1em;
+}
+button:hover { background-color: #00cc77; }
+
+#timer {
+    margin-top: 10px;
+    font-size: 1.1em;
+    color: #ffff66;
+    text-align: center;
+}
+
+#feedback { margin-top: 20px; }
+
+.guess-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 6px;
+    background-color: #333;
+    padding: 6px;
+    border-radius: 5px;
+}
+
+.correct-place { color: #00ff99; font-weight: bold; }
+.correct-letter { color: #ffff66; font-weight: bold; }
+.incorrect { color: #ff4444; font-weight: bold; }
+
+#congrats {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #00ff99;
+    color: #000;
+    padding: 30px 50px;
+    font-size: 1.5em;
+    font-weight: bold;
+    border-radius: 15px;
+    display: none;
+    text-align: center;
+    box-shadow: 0 0 20px #00ff99;
+    z-index: 10;
+}
+</style>
+</head>
+<body>
+
+<h1>Guess the Word 🎯</h1>
+
+<div id="game">
+    <input type="text" id="guessInput" maxlength="5" placeholder="Enter 5 letters (A–E)">
+    <button onclick="submitGuess()">Guess</button>
+    <div id="timer">Time: 0.0 s</div>
+    <div id="feedback"></div>
+</div>
+
+<div id="congrats"></div>
+
+<script>
+const letters = ['A','B','C','D','E'];
+let target = '';
+let attempts = 0;
+
+// Timer variables
+let startTime = null;
+let timerInterval = null;
+
+function generateWord(){
+    target = '';
+    for(let i=0;i<5;i++){
+        target += letters[Math.floor(Math.random()*letters.length)];
+    }
+    console.log("Target:", target); // debug
+}
+
+generateWord();
+
+function startTimer(){
+    startTime = Date.now();
+    timerInterval = setInterval(() => {
+        const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
+        document.getElementById('timer').textContent = `Time: ${elapsed} s`;
+    }, 100);
+}
+
+function stopTimer(){
+    clearInterval(timerInterval);
+    return ((Date.now() - startTime) / 1000).toFixed(1);
+}
+
+function submitGuess(){
+    const input = document.getElementById('guessInput');
+    let guess = input.value.toUpperCase();
+
+    if(guess.length !== 5){
+        alert("Enter exactly 5 letters.");
+        return;
+    }
+
+    // Start timer on first guess
+    if(attempts === 0){
+        startTimer();
+    }
+
+    attempts++;
+
+    let correctPlace = 0;
+    let correctLetter = 0;
+
+    let targetArr = target.split('');
+    let guessArr = guess.split('');
+    let usedTarget = Array(5).fill(false);
+
+    // Correct place
+    for(let i=0;i<5;i++){
+        if(guessArr[i] === targetArr[i]){
+            correctPlace++;
+            usedTarget[i] = true;
+            guessArr[i] = null;
+        }
+    }
+
+    // Correct letter, wrong place
+    for(let i=0;i<5;i++){
+        if(guessArr[i] !== null){
+            for(let j=0;j<5;j++){
+                if(!usedTarget[j] && guessArr[i] === targetArr[j]){
+                    correctLetter++;
+                    usedTarget[j] = true;
+                    break;
+                }
+            }
+        }
+    }
+
+    let incorrect = 5 - correctPlace - correctLetter;
+
+    const feedbackDiv = document.getElementById('feedback');
+    const row = document.createElement('div');
+    row.className = 'guess-row';
+    row.innerHTML = `
+        <span>${guess}</span>
+        <span>
+            <span class="correct-place">✔${correctPlace}</span>
+            <span class="correct-letter">~${correctLetter}</span>
+            <span class="incorrect">✖${incorrect}</span>
+        </span>
+    `;
+    feedbackDiv.prepend(row);
+
+    input.value = '';
+    input.focus();
+
+    if(correctPlace === 5){
+        const timeTaken = stopTimer();
+        showCongrats(`🎉 Congratulations!<br>
+                      You guessed the word in <b>${attempts}</b> tries<br>
+                      ⏱ Time taken: <b>${timeTaken} seconds</b>`);
+
+        // Reset game
+        attempts = 0;
+        document.getElementById('timer').textContent = 'Time: 0.0 s';
+        feedbackDiv.innerHTML = '';
+        generateWord();
+    }
+}
+
+function showCongrats(message){
+    const box = document.getElementById('congrats');
+    box.innerHTML = message;
+    box.style.display = 'block';
+    setTimeout(() => box.style.display = 'none', 300000);
+}
+</script>
+
+</body>
+</html>

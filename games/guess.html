@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Guess the Number</title>
+    <style>
+      body {
+        background: #0f1226;
+        color: white;
+        font-family: Arial, sans-serif;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding-top: 60px;
+      }
+
+      h1 {
+        color: #00ffcc;
+      }
+
+      #game {
+        background: #1e223f;
+        padding: 25px;
+        border-radius: 12px;
+        width: 350px;
+        text-align: center;
+        box-shadow: 0 0 20px #000;
+      }
+
+      input {
+        width: 100%;
+        padding: 10px;
+        font-size: 1.1em;
+        margin: 10px 0;
+        border-radius: 6px;
+        border: none;
+        text-align: center;
+      }
+
+      button {
+        padding: 10px 25px;
+        font-size: 1em;
+        font-weight: bold;
+        border: none;
+        border-radius: 6px;
+        background: #00ffcc;
+        cursor: pointer;
+      }
+
+      button:hover {
+        background: #00d9aa;
+      }
+
+      #message {
+        margin-top: 15px;
+        font-size: 1.1em;
+      }
+
+      #timer {
+        margin-top: 10px;
+        color: #ffeb3b;
+      }
+
+      #congrats {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: #00ffcc;
+        color: #000;
+        padding: 30px 40px;
+        border-radius: 15px;
+        font-size: 1.4em;
+        text-align: center;
+        display: none;
+        box-shadow: 0 0 25px #00ffcc;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Guess the Number 🔢</h1>
+
+    <div id="game">
+      <p>Guess a number between <b>1</b> and <b>1,000,000</b></p>
+      <input type="number" id="guess" placeholder="Enter your guess" />
+      <button onclick="checkGuess()">Guess</button>
+
+      <div id="message"></div>
+      <div id="timer">Time: 0.0 s</div>
+    </div>
+
+    <div id="congrats"></div>
+
+    <script>
+      let target = Math.floor(Math.random() * 1000000) + 1;
+      let attempts = 0;
+      let startTime = null;
+      let timerInterval = null;
+
+      function startTimer() {
+        startTime = Date.now();
+        timerInterval = setInterval(() => {
+          const t = ((Date.now() - startTime) / 1000).toFixed(1);
+          document.getElementById("timer").textContent = `Time: ${t} s`;
+        }, 100);
+      }
+
+      function stopTimer() {
+        clearInterval(timerInterval);
+        return ((Date.now() - startTime) / 1000).toFixed(1);
+      }
+
+      function checkGuess() {
+        const input = document.getElementById("guess");
+        const guess = Number(input.value);
+
+        if (!guess || guess < 1 || guess > 1000000) {
+          document.getElementById("message").textContent =
+            "⚠ Enter a valid number!";
+          return;
+        }
+
+        if (attempts === 0) startTimer();
+        attempts++;
+
+        if (guess < target) {
+          document.getElementById("message").textContent = "🔼 Go Higher";
+        } else if (guess > target) {
+          document.getElementById("message").textContent = "🔽 Go Lower";
+        } else {
+          const timeTaken = stopTimer();
+          showCongrats(
+            `🎉 Congratulations!<br>
+             Number: <b>${target}</b><br>
+             Attempts: <b>${attempts}</b><br>
+             Time: <b>${timeTaken} seconds</b>`,
+          );
+          resetGame();
+        }
+
+        input.value = "";
+        input.focus();
+      }
+
+      function showCongrats(text) {
+        const box = document.getElementById("congrats");
+        box.innerHTML = text;
+        box.style.display = "block";
+        setTimeout(() => (box.style.display = "none"), 300000);
+      }
+
+      function resetGame() {
+        target = Math.floor(Math.random() * 1000) + 1;
+        attempts = 0;
+        document.getElementById("timer").textContent = "Time: 0.0 s";
+        document.getElementById("message").textContent = "";
+      }
+    </script>
+  </body>
+</html>

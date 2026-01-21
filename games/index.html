@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Lights Out Puzzle</title>
+<style>
+body {
+    background: #222;
+    color: #fff;
+    font-family: Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 20px;
+}
+h1 { color: #00ff99; margin-bottom: 10px; }
+#grid {
+    display: grid;
+    grid-template-columns: repeat(5, 60px);
+    grid-template-rows: repeat(5, 60px);
+    gap: 5px;
+}
+.cell {
+    width: 60px;
+    height: 60px;
+    cursor: pointer;
+    transition: 0.2s;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.5em;
+    font-weight: bold;
+    border-radius: 5px;
+}
+.on { background-color: #ffff66; color: #000; }
+.off { background-color: #333; color: #fff; }
+button {
+    margin-top: 20px;
+    padding: 10px 20px;
+    font-weight: bold;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    background-color: #00ff99;
+    color: #000;
+}
+button:hover { background-color: #00cc77; }
+#message { margin-top: 20px; font-size: 1.2em; }
+</style>
+</head>
+<body>
+
+<h1>Lights Out Puzzle 💡</h1>
+<div id="grid"></div>
+<p id="message">Click a light to toggle it and its neighbors. Turn all lights off to win!</p>
+<button onclick="resetGrid()">Reset</button>
+
+<script>
+const size = 5;
+let grid = [];
+
+function createGrid() {
+    const gridDiv = document.getElementById('grid');
+    gridDiv.innerHTML = '';
+    grid = [];
+
+    for (let r = 0; r < size; r++) {
+        grid[r] = [];
+        for (let c = 0; c < size; c++) {
+            const cell = document.createElement('div');
+            cell.classList.add('cell');
+            const state = Math.random() < 0.5 ? 'on' : 'off';
+            cell.classList.add(state);
+            cell.dataset.row = r;
+            cell.dataset.col = c;
+            cell.addEventListener('click', () => toggle(r, c));
+            gridDiv.appendChild(cell);
+            grid[r][c] = cell;
+        }
+    }
+    document.getElementById('message').textContent = 'Click a light to toggle it and its neighbors.';
+}
+
+function toggle(r, c) {
+    const positions = [[r,c],[r+1,c],[r-1,c],[r,c+1],[r,c-1]];
+    positions.forEach(([x,y]) => {
+        if (x >= 0 && x < size && y >= 0 && y < size) {
+            grid[x][y].classList.toggle('on');
+            grid[x][y].classList.toggle('off');
+        }
+    });
+
+    checkWin();
+}
+
+function checkWin() {
+    for (let r = 0; r < size; r++) {
+        for (let c = 0; c < size; c++) {
+            if (grid[r][c].classList.contains('on')) return;
+        }
+    }
+    document.getElementById('message').textContent = '🎉 You won! All lights are off!';
+}
+
+function resetGrid() { createGrid(); }
+
+createGrid();
+</script>
+</body>
+</html>

@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Symbol Memory Game</title>
+
+<style>
+body {
+    background: #0f172a;
+    color: white;
+    font-family: Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 40px;
+}
+
+h1 { color: #38bdf8; }
+
+#level {
+    margin: 10px;
+    font-size: 1.2em;
+}
+
+#display, #input {
+    display: flex;
+    gap: 15px;
+    margin: 20px;
+}
+
+.symbol {
+    font-size: 40px;
+    cursor: pointer;
+    padding: 10px;
+    border-radius: 8px;
+    background: #1e293b;
+    user-select: none;
+}
+
+.symbol:hover {
+    background: #334155;
+}
+
+#message {
+    margin-top: 15px;
+    font-size: 1.1em;
+    min-height: 24px;
+}
+
+button {
+    padding: 10px 25px;
+    font-size: 1em;
+    font-weight: bold;
+    border: none;
+    border-radius: 6px;
+    background: #38bdf8;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #0ea5e9;
+}
+</style>
+</head>
+<body>
+
+<h1>Symbol Memory Game</h1>
+
+<div id="level">Level 1</div>
+
+<button onclick="startGame()">START</button>
+
+<div id="display"></div>
+
+<div id="input" style="display:none;">
+    <div class="symbol" onclick="playerSelect('C')">⚪</div>
+    <div class="symbol" onclick="playerSelect('T')">▲</div>
+    <div class="symbol" onclick="playerSelect('R')">▭</div>
+    <div class="symbol" onclick="playerSelect('S')">★</div>
+</div>
+
+<div id="message"></div>
+
+<script>
+const symbols = {
+    C: "O",
+    T: "▲",
+    R: "▭",
+    S: "★"
+};
+
+const levels = {
+    1: 3,
+    2: 6,
+    3: 10
+};
+
+let currentLevel = 1;
+let sequence = [];
+let playerInput = [];
+let showing = false;
+
+function startGame() {
+    currentLevel = 1;
+    startLevel();
+}
+
+function startLevel() {
+    document.getElementById("level").textContent = `Level ${currentLevel}`;
+    document.getElementById("message").textContent = "";
+    document.getElementById("display").innerHTML = "";
+    document.getElementById("input").style.display = "none";
+
+    sequence = [];
+    playerInput = [];
+
+    generateSequence();
+    showSequence();
+}
+
+function generateSequence() {
+    const count = levels[currentLevel];
+    const keys = Object.keys(symbols);
+    let last = null;
+
+    for (let i = 0; i < count; i++) {
+        let pick;
+        do {
+            pick = keys[Math.floor(Math.random() * keys.length)];
+        } while (pick === last);
+        sequence.push(pick);
+        last = pick;
+    }
+}
+
+function showSequence() {
+    const display = document.getElementById("display");
+    display.innerHTML = "";
+    showing = true;
+
+    sequence.forEach((sym, index) => {
+        setTimeout(() => {
+            const el = document.createElement("div");
+            el.className = "symbol";
+            el.textContent = symbols[sym];
+            display.appendChild(el);
+        }, index * 1000);
+    });
+
+    // Hide ALL symbols together after last one + 1 second
+    setTimeout(() => {
+        display.innerHTML = "";
+        showing = false;
+        document.getElementById("input").style.display = "flex";
+    }, sequence.length * 1000 + 1000);
+}
+
+function playerSelect(sym) {
+    if (showing) return;
+
+    playerInput.push(sym);
+    const idx = playerInput.length - 1;
+
+    if (playerInput[idx] !== sequence[idx]) {
+        loseGame();
+        return;
+    }
+
+    if (playerInput.length === sequence.length) {
+        winLevel();
+    }
+}
+
+function winLevel() {
+    if (currentLevel < 3) {
+        document.getElementById("message").textContent = "✅ Correct! Next level...";
+        currentLevel++;
+        setTimeout(startLevel, 1500);
+    } else {
+        document.getElementById("message").textContent = "🎉 YOU WON ALL LEVELS!";
+    }
+}
+
+function loseGame() {
+    document.getElementById("message").textContent = "❌ Wrong! Back to Level 1";
+}
+</script>
+
+</body>
+</html>
