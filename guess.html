@@ -1,180 +1,192 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Guess the Number</title>
-    <style>
-      body {
-        background: #0f1226;
-        color: white;
-        font-family: Arial, sans-serif;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        padding-top: 60px;
-      }
+<title>Guess the Number</title>
 
-      h1 {
-        color: #00ffcc;
-      }
+<style>
+body {
+  background: #0f1226;
+  color: white;
+  font-family: Arial, sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 60px;
+}
 
-      #game {
-        background: #1e223f;
-        padding: 25px;
-        border-radius: 12px;
-        width: 350px;
-        text-align: center;
-        box-shadow: 0 0 20px #000;
-      }
+h1 { color: #00ffcc; }
 
-      input {
-        width: 100%;
-        padding: 10px;
-        font-size: 1.1em;
-        margin: 10px 0;
-        border-radius: 6px;
-        border: none;
-        text-align: center;
-      }
+#game {
+  background: #1e223f;
+  padding: 25px;
+  border-radius: 12px;
+  width: min(90vw, 350px);
+  text-align: center;
+  box-shadow: 0 0 20px #000;
+}
 
-      button {
-        padding: 10px 25px;
-        font-size: 1em;
-        font-weight: bold;
-        border: none;
-        border-radius: 6px;
-        background: #00ffcc;
-        cursor: pointer;
-      }
+input {
+  width: 100%;
+  padding: 10px;
+  font-size: 1.1em;
+  margin: 10px 0;
+  border-radius: 6px;
+  border: none;
+  text-align: center;
+}
 
-      button:hover {
-        background: #00d9aa;
-      }
+button {
+  padding: 10px 25px;
+  font-size: 1em;
+  font-weight: bold;
+  border: none;
+  border-radius: 6px;
+  background: #00ffcc;
+  cursor: pointer;
+}
 
-      #message {
-        margin-top: 15px;
-        font-size: 1.1em;
-      }
+button:hover { background: #00d9aa; }
 
-      #timer {
-        margin-top: 10px;
-        color: #ffeb3b;
-      }
+#message {
+  margin-top: 15px;
+  font-size: 1.1em;
+}
 
-      #congrats {
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        background: #00ffcc;
-        color: #000;
-        padding: 30px 40px;
-        border-radius: 15px;
-        font-size: 1.4em;
-        text-align: center;
-        display: none;
-        box-shadow: 0 0 25px #00ffcc;
-      }
+#timer {
+  margin-top: 10px;
+  color: #ffeb3b;
+  font-weight: bold;
+}
 
-      #next-game-btn {
-        margin-top: 15px;
-        padding: 10px 20px;
-        font-size: 1em;
-        border-radius: 6px;
-        border: none;
-        cursor: pointer;
-        background: #ff9800;
-      }
+#congrats {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: #00ffcc;
+  color: #000;
+  padding: 30px 40px;
+  border-radius: 15px;
+  font-size: 1.3em;
+  text-align: center;
+  display: none;
+  box-shadow: 0 0 25px #00ffcc;
+}
 
-      #next-game-btn:hover {
-        background: #e68900;
-      }
-    </style>
-  </head>
-  <body>
-    <h1>Guess the Number 🔢</h1>
+#next-game-btn {
+  margin-top: 15px;
+  padding: 10px 20px;
+  font-size: 1em;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  background: #ff9800;
+}
 
-    <div id="game">
-      <p>Guess a number between <b>1</b> and <b>1,000,000</b></p>
-      <input type="number" id="guess" placeholder="Enter your guess" />
-      <button onclick="checkGuess()">Guess</button>
+#next-game-btn:hover { background: #e68900; }
+</style>
+</head>
 
-      <div id="message"></div>
-      <div id="timer">Time: 0.0 s</div>
-    </div>
+<body>
 
-    <div id="congrats"></div>
+<h1>Guess the Number 🔢</h1>
 
-    <script>
-      let target = Math.floor(Math.random() * 10) + 1;
-      let attempts = 0;
-      let startTime = null;
-      let timerInterval = null;
+<div id="game">
+  <p>Guess a number between <b>1</b> and <b>1,000,000</b></p>
+  <input type="number" id="guess" placeholder="Enter your guess" />
+  <button onclick="checkGuess()">Guess</button>
 
-      function startTimer() {
-        startTime = Date.now();
-        timerInterval = setInterval(() => {
-          const t = ((Date.now() - startTime) / 1000).toFixed(1);
-          document.getElementById("timer").textContent = `Time: ${t} s`;
-        }, 100);
-      }
+  <div id="message"></div>
+  <div id="timer">Time: 05:00</div>
+</div>
 
-      function stopTimer() {
-        clearInterval(timerInterval);
-        return ((Date.now() - startTime) / 1000).toFixed(1);
-      }
+<div id="congrats"></div>
 
-      function checkGuess() {
-        const input = document.getElementById("guess");
-        const guess = Number(input.value);
+<script>
+let target = Math.floor(Math.random() * 1000000) + 1;
+let attempts = 0;
 
-        if (!guess || guess < 1 || guess > 1000000) {
-          document.getElementById("message").textContent =
-            "⚠ Enter a valid number!";
-          return;
-        }
+/* Timer */
+let timeLeft = 15; // 5 minutes change here
+let timerStarted = false;
+let timerInterval = null;
 
-        if (attempts === 0) startTimer();
-        attempts++;
+function startTimer() {
+  if (timerStarted) return;
+  timerStarted = true;
 
-        if (guess < target) {
-          document.getElementById("message").textContent = "🔼 Go Higher";
-        } else if (guess > target) {
-          document.getElementById("message").textContent = "🔽 Go Lower";
-        } else {
-          const timeTaken = stopTimer();
-          showCongrats(
-            `🎉 Congratulations!<br>
-             Number: <b>${target}</b><br>
-             Attempts: <b>${attempts}</b><br>
-             Time: <b>${timeTaken} seconds</b>`
-          );
-          resetGame();
-        }
+  timerInterval = setInterval(() => {
+    timeLeft--;
+    updateTimer();
 
-        input.value = "";
-        input.focus();
-      }
+    if (timeLeft <= 0) {
+      clearInterval(timerInterval);
+      endGameByTimeout();
+    }
+  }, 1000);
+}
 
-      function showCongrats(text) {
-        const box = document.getElementById("congrats");
-        box.innerHTML = text + `<br><button id="next-game-btn" onclick="goToNextGame()">Next Game ▶</button>`;
-        box.style.display = "block";
-      }
+function updateTimer() {
+  const min = String(Math.floor(timeLeft / 60)).padStart(2, '0');
+  const sec = String(timeLeft % 60).padStart(2, '0');
+  document.getElementById("timer").textContent = `Time: ${min}:${sec}`;
+}
 
-      function resetGame() {
-        target = Math.floor(Math.random() * 1000000) + 1;
-        attempts = 0;
-        document.getElementById("timer").textContent = "Time: 0.0 s";
-        document.getElementById("message").textContent = "";
-      }
+function checkGuess() {
+  const input = document.getElementById("guess");
+  const guess = Number(input.value);
 
-      function goToNextGame() {
-        // Replace with the URL or function of the next game
-        window.location.href = "knight.html"; // <-- this can be changed
-      }
-    </script>
-  </body>
+  if (!guess || guess < 1 || guess > 1000000) {
+    document.getElementById("message").textContent =
+      "⚠ Enter a valid number!";
+    return;
+  }
+
+  if (attempts === 0) startTimer();
+  attempts++;
+
+  if (guess < target) {
+    document.getElementById("message").textContent = "🔼 Go Higher";
+  } else if (guess > target) {
+    document.getElementById("message").textContent = "🔽 Go Lower";
+  } else {
+    clearInterval(timerInterval);
+    showCongrats(
+      `🎉 Congratulations!<br>
+       Number: <b>${target}</b><br>
+       Attempts: <b>${attempts}</b><br>
+       Time left: <b>${document.getElementById("timer").textContent.replace("Time: ","")}</b>`
+    );
+  }
+
+  input.value = "";
+  input.focus();
+}
+
+function endGameByTimeout() {
+  document.getElementById("message").textContent = "";
+  showCongrats(
+    `⏰ Time's up!<br>
+     You couldn't guess the number.<br>
+     Attempts: <b>${attempts}</b>`
+  );
+}
+
+function showCongrats(text) {
+  const box = document.getElementById("congrats");
+  box.innerHTML =
+    text +
+    `<br><button id="next-game-btn" onclick="goToNextGame()">Next Game ▶</button>`;
+  box.style.display = "block";
+}
+
+function goToNextGame() {
+  window.location.href = "knight.html";
+}
+</script>
+
+</body>
 </html>
