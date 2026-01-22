@@ -95,7 +95,7 @@ button:hover { background: #00d9aa; }
 <h1>Guess the Number 🔢</h1>
 
 <div id="game">
-  <p>Guess a number between <b>1</b> and <b>1,000,000</b></p>
+  <p>Guess a number between <b>1</b> and <b>100,000</b></p>
   <input type="number" id="guess" placeholder="Enter your guess" />
   <button onclick="checkGuess()">Guess</button>
 
@@ -106,7 +106,7 @@ button:hover { background: #00d9aa; }
 <div id="congrats"></div>
 
 <script>
-let target = Math.floor(Math.random() * 1000000) + 1;
+let target = Math.floor(Math.random() * 100000) + 1;
 let attempts = 0;
 
 /* Timer */
@@ -139,7 +139,7 @@ function checkGuess() {
   const input = document.getElementById("guess");
   const guess = Number(input.value);
 
-  if (!guess || guess < 1 || guess > 1000000) {
+  if (!guess || guess < 1 || guess > 100000) {
     document.getElementById("message").textContent = "⚠ Enter a valid number!";
     return;
   }
