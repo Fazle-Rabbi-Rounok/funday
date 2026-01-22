@@ -110,7 +110,7 @@ let target = Math.floor(Math.random() * 1000000) + 1;
 let attempts = 0;
 
 /* Timer */
-let timeLeft = 15; // 5 minutes change here
+let timeLeft = 7; // 5 minutes in seconds
 let timerStarted = false;
 let timerInterval = null;
 
@@ -140,8 +140,7 @@ function checkGuess() {
   const guess = Number(input.value);
 
   if (!guess || guess < 1 || guess > 1000000) {
-    document.getElementById("message").textContent =
-      "⚠ Enter a valid number!";
+    document.getElementById("message").textContent = "⚠ Enter a valid number!";
     return;
   }
 
@@ -167,10 +166,10 @@ function checkGuess() {
 }
 
 function endGameByTimeout() {
-  document.getElementById("message").textContent = "";
   showCongrats(
     `⏰ Time's up!<br>
      You couldn't guess the number.<br>
+     The correct number was: <b>${target}</b><br>
      Attempts: <b>${attempts}</b>`
   );
 }
